@@ -15,6 +15,32 @@ export class App extends Component {
     filter: '',
   };
 
+  componentDidMount() {
+    const contacts = localStorage.getItem('contacts');
+    if (contacts) {
+      this.setState({ contacts: JSON.parse(contacts) });
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.contacts !== this.state.contacts)
+      localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
+
+    if (prevState.contacts.length > this.state.contacts.length) {
+      this.setState({ isDelete: true });
+      setTimeout(() => {
+        this.setState({ isDelete: false });
+      }, 1500);
+    }
+
+    if (prevState.contacts.length < this.state.contacts.length) {
+      this.setState({ isCreate: true });
+      setTimeout(() => {
+        this.setState({ isCreate: false });
+      }, 1500);
+    }
+  }
+
   handleCreate = e => {
     e.preventDefault();
     const form = e.currentTarget;
@@ -44,8 +70,8 @@ export class App extends Component {
     const index = this.state.contacts.findIndex(
       contact => contact.id === target.id
     );
-    console.log(index);
     this.state.contacts.splice(index, 1);
+    localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
     this.setState({
       contacts: this.state.contacts,
     });
